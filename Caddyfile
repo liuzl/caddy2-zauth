@@ -1,0 +1,11 @@
+{
+    order zauth before respond
+}
+
+127.0.0.1:2021 {
+    zauth
+    file_server browse
+    log {
+        output file ./access.log
+    }
+}
