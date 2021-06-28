@@ -4,14 +4,18 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/golang/glog"
+	"github.com/caddyserver/caddy/v2"
 	"github.com/liuzl/store"
+	"go.uber.org/zap"
 	"zliu.org/goutil"
 )
 
 func (m *Middleware) addAccountHandler(w http.ResponseWriter, r *http.Request) {
-	glog.Infof("addr=%s  method=%s host=%s uri=%s",
-		r.RemoteAddr, r.Method, r.Host, r.RequestURI)
+	caddy.Log().Info("addAccountHandler",
+		zap.String("remote_addr", r.RemoteAddr),
+		zap.String("method", r.Method),
+		zap.String("host", r.Host),
+		zap.String("request_uri", r.RequestURI))
 	r.ParseForm()
 	uname := strings.TrimSpace(r.FormValue("uname"))
 	ak := goutil.GenerateRandomString(20)
@@ -19,17 +23,22 @@ func (m *Middleware) addAccountHandler(w http.ResponseWriter, r *http.Request) {
 	account := &Account{Uname: uname, AccessKey: ak, SecretKey: sk}
 	b, err := store.ObjectToBytes(account)
 	if err != nil {
-		glog.Fatal(err)
+		caddy.Log().Fatal("fatal error", zap.Error(err))
 	}
 	err = m.getAuthDB().Put(ak, b)
-	glog.Infof("new account: uname=%s, ak=%s, sk=%s", uname, ak, sk)
+	caddy.Log().Info("new account",
+		zap.String("uname", uname), zap.String("ak", ak), zap.String("sk", sk))
 	ret := MakeResponse(err, "", account)
 	MustEncode(w, ret)
 }
 
 func (m *Middleware) getAllAccountsHandler(w http.ResponseWriter, r *http.Request) {
-	glog.Infof("addr=%s  method=%s host=%s uri=%s",
-		r.RemoteAddr, r.Method, r.Host, r.RequestURI)
+	caddy.Log().Info("getAllAccountsHandler",
+		zap.String("remote_addr", r.RemoteAddr),
+		zap.String("method", r.Method),
+		zap.String("host", r.Host),
+		zap.String("request_uri", r.RequestURI))
+
 	var accounts []*Account
 	err := m.getAuthDB().ForEach(nil, func(key, value []byte) (bool, error) {
 		account := new(Account)
@@ -46,6 +55,6 @@ func (m *Middleware) getAllAccountsHandler(w http.ResponseWriter, r *http.Reques
 func (m *Middleware) admin() {
 	http.HandleFunc("/api/add_account", m.addAccountHandler)
 	http.HandleFunc("/api/get_all_accounts", m.getAllAccountsHandler)
-	glog.Info("zauth admin server listen on ", m.AuthAdminAddr)
-	glog.Error(http.ListenAndServe(m.AuthAdminAddr, nil))
+	caddy.Log().Info("zauth admin server started", zap.String("listen", m.AuthAdminAddr))
+	caddy.Log().Error("zauth", zap.Error(http.ListenAndServe(m.AuthAdminAddr, nil)))
 }
