@@ -40,7 +40,8 @@ var authDB *store.LevelStore
 // Middleware implements an HTTP handler that implements the
 // ak, sk auth.
 type Middleware struct {
-	AuthDBDir string `json:"auth_db_dir,omitempty"`
+	AuthDBDir     string `json:"auth_db_dir,omitempty"`
+	AuthAdminAddr string `json:"auth_admin_addr,omitempty`
 }
 
 // CaddyModule returns the Caddy module information.
@@ -56,6 +57,11 @@ func (m *Middleware) Provision(ctx caddy.Context) error {
 	if m.AuthDBDir == "" {
 		m.AuthDBDir = filepath.Join(filepath.Dir(os.Args[0]), "authdb")
 	}
+	if m.AuthAdminAddr == "" {
+		m.AuthAdminAddr = "127.0.0.1:1983"
+	}
+	//TODO web api
+	go m.admin()
 	return nil
 }
 
@@ -104,7 +110,10 @@ func (m *Middleware) UnmarshalCaddyfile(d *caddyfile.Dispenser) error {
 				if d.NextArg() {
 					m.AuthDBDir = d.Val()
 				}
-				// ...
+			case "auth_admin_addr":
+				if d.NextArg() {
+					m.AuthAdminAddr = d.Val()
+				}
 			}
 		}
 	}

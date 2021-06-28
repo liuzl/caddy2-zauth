@@ -17,10 +17,9 @@ var (
 )
 
 type Account struct {
-	Uname       string `json:"uname"`
-	AccessKey   string `json:"access_key"`
-	SecretKey   string `json:"secret_key"`
-	ProjectName string `json:"project_name"`
+	Uname     string `json:"uname"`
+	AccessKey string `json:"access_key"`
+	SecretKey string `json:"secret_key"`
 }
 
 type Authorization struct {
