@@ -2,7 +2,7 @@
 
 ## Overview
 
-`zauth` is a ak/sk authentication  middleware for [Caddy](https://github.com/caddyserver/caddy) v2.
+`zauth` is a HMAC(AK/SK) authentication middleware for [Caddy](https://github.com/caddyserver/caddy) v2.
 
 ## Installation
 
