@@ -53,8 +53,8 @@ func (m *Middleware) getAllAccountsHandler(w http.ResponseWriter, r *http.Reques
 }
 
 func (m *Middleware) admin() {
-	http.HandleFunc("/api/add_account", m.addAccountHandler)
-	http.HandleFunc("/api/get_all_accounts", m.getAllAccountsHandler)
+	http.HandleFunc("/zauth/add_account", m.addAccountHandler)
+	http.HandleFunc("/zauth/get_all_accounts", m.getAllAccountsHandler)
 	caddy.Log().Info("zauth admin server started", zap.String("listen", m.AuthAdminAddr))
 	caddy.Log().Error("zauth", zap.Error(http.ListenAndServe(m.AuthAdminAddr, nil)))
 }

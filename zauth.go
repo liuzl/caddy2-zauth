@@ -34,7 +34,7 @@ func init() {
 	httpcaddyfile.RegisterHandlerDirective("zauth", parseCaddyfile)
 }
 
-var once sync.Once
+var once, onceAdmin sync.Once
 var authDB *store.LevelStore
 
 // Middleware implements an HTTP handler that implements the
@@ -61,7 +61,9 @@ func (m *Middleware) Provision(ctx caddy.Context) error {
 		m.AuthAdminAddr = "127.0.0.1:1983"
 	}
 	//TODO web api
-	go m.admin()
+	onceAdmin.Do(func() {
+		go m.admin()
+	})
 	return nil
 }
 
