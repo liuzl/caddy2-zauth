@@ -58,8 +58,8 @@ func (m *Middleware) delAccountHandler(w http.ResponseWriter, r *http.Request) {
 		zap.String("method", r.Method),
 		zap.String("host", r.Host),
 		zap.String("request_uri", r.RequestURI))
-	uname := strings.TrimSpace(r.FormValue("uname"))
-	err := m.getAuthDB().Delete(uname)
+	ak := strings.TrimSpace(r.FormValue("ak"))
+	err := m.getAuthDB().Delete(ak)
 	ret := MakeResponse(err, "", 1)
 	MustEncode(w, ret)
 }
