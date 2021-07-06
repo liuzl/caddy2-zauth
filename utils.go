@@ -164,8 +164,6 @@ func (m *Middleware) authorize(r *http.Request) (bool, error) {
 	curTs = time.Now()
 	if creditAuth.Ts.Add(300*time.Second).Before(curTs) ||
 		creditAuth.Ts.After(curTs.Add(time.Duration(creditAuth.Expire+300)*time.Second)) {
-		//lazy delete record by ak
-		m.getAuthDB().Delete(creditAuth.Ak)
 		return false, ExpiredRequestErr
 	}
 
