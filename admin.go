@@ -52,9 +52,22 @@ func (m *Middleware) getAllAccountsHandler(w http.ResponseWriter, r *http.Reques
 	MustEncode(w, ret)
 }
 
+func (m *Middleware) delAccountHandler(w http.ResponseWriter, r *http.Request) {
+	caddy.Log().Info("delAccountHandler",
+		zap.String("remote_addr", r.RemoteAddr),
+		zap.String("method", r.Method),
+		zap.String("host", r.Host),
+		zap.String("request_uri", r.RequestURI))
+	ak := strings.TrimSpace(r.FormValue("ak"))
+	err := m.getAuthDB().Delete(ak)
+	ret := MakeResponse(err, "", 1)
+	MustEncode(w, ret)
+}
+
 func (m *Middleware) admin() {
 	http.HandleFunc("/zauth/add_account", m.addAccountHandler)
 	http.HandleFunc("/zauth/get_all_accounts", m.getAllAccountsHandler)
+	http.HandleFunc("/zauth/del_account", m.delAccountHandler)
 	caddy.Log().Info("zauth admin server started", zap.String("listen", m.AuthAdminAddr))
 	caddy.Log().Error("zauth", zap.Error(http.ListenAndServe(m.AuthAdminAddr, nil)))
 }
